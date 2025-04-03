@@ -25,7 +25,8 @@ enum TooltipAlignment {
 /// [currentOffset] is the current offset of the tooltip.
 /// [parentSize] is the size of the parent widget.
 /// [tooltipSize] is the size of the tooltip widget.
-typedef BuildTooltipOffset = Offset Function(Offset currentOffset, Size parentSize, Size tooltipSize);
+typedef BuildTooltipOffset =
+    Offset Function(Offset currentOffset, Size parentSize, Size tooltipSize);
 
 /// A callback that is called when the tooltip is triggered.
 typedef TooltipTriggeredCallback = void Function();
@@ -64,8 +65,10 @@ class _RenderExclusiveMouseRegion extends RenderMouseRegion {
     final outermost = isOutermostMouseRegion;
     isOutermostMouseRegion = false;
     if (size.contains(position)) {
-      isHit = hitTestChildren(result, position: position) || hitTestSelf(position);
-      if ((isHit || behavior == HitTestBehavior.translucent) && !foundInnermostMouseRegion) {
+      isHit =
+          hitTestChildren(result, position: position) || hitTestSelf(position);
+      if ((isHit || behavior == HitTestBehavior.translucent) &&
+          !foundInnermostMouseRegion) {
         foundInnermostMouseRegion = true;
         result.add(BoxHitTestEntry(this, position));
       }
@@ -164,7 +167,8 @@ class TooltipPlus extends StatefulWidget {
   State<TooltipPlus> createState() => TooltipPlusState();
 }
 
-class TooltipPlusState extends State<TooltipPlus> with SingleTickerProviderStateMixin {
+class TooltipPlusState extends State<TooltipPlus>
+    with SingleTickerProviderStateMixin {
   static const _fadeInDuration = Duration(milliseconds: 250);
   static const _fadeOutDuration = Duration(milliseconds: 175);
   static const _defaultShowDuration = Duration(milliseconds: 1000);
@@ -178,11 +182,13 @@ class TooltipPlusState extends State<TooltipPlus> with SingleTickerProviderState
 
   Duration get _showDuration => widget.showDuration ?? _defaultShowDuration;
 
-  Duration get _hoverExitDuration => widget.exitDuration ?? _defaultHoverExitDuration;
+  Duration get _hoverExitDuration =>
+      widget.exitDuration ?? _defaultHoverExitDuration;
 
   Duration get _waitDuration => widget.waitDuration ?? _defaultWaitDuration;
 
-  TooltipTriggerMode get _triggerMode => widget.triggerMode ?? _defaultTriggerMode;
+  TooltipTriggerMode get _triggerMode =>
+      widget.triggerMode ?? _defaultTriggerMode;
 
   bool get _enableFeedback => widget.enableFeedback ?? _defaultEnableFeedback;
 
@@ -204,7 +210,9 @@ class TooltipPlusState extends State<TooltipPlus> with SingleTickerProviderState
 
   static bool _isTooltipVisible(AnimationStatus status) {
     return switch (status) {
-      AnimationStatus.completed || AnimationStatus.forward || AnimationStatus.reverse => true,
+      AnimationStatus.completed ||
+      AnimationStatus.forward ||
+      AnimationStatus.reverse => true,
       AnimationStatus.dismissed => false,
     };
   }
@@ -225,16 +233,23 @@ class TooltipPlusState extends State<TooltipPlus> with SingleTickerProviderState
     _animationStatus = status;
   }
 
-  void _scheduleShowTooltip({required Duration withDelay, Duration? showDuration}) {
+  void _scheduleShowTooltip({
+    required Duration withDelay,
+    Duration? showDuration,
+  }) {
     void show() {
       if (!_visible) return;
       _controller.forward();
       _timer?.cancel();
-      _timer = showDuration == null ? null : Timer(showDuration, _controller.reverse);
+      _timer =
+          showDuration == null
+              ? null
+              : Timer(showDuration, _controller.reverse);
     }
 
     assert(
-      !(_timer?.isActive ?? false) || _controller.status != AnimationStatus.reverse,
+      !(_timer?.isActive ?? false) ||
+          _controller.status != AnimationStatus.reverse,
       'timer must not be active when the tooltip is fading out',
     );
 
@@ -253,7 +268,8 @@ class TooltipPlusState extends State<TooltipPlus> with SingleTickerProviderState
 
   void _scheduleDismissTooltip({required Duration withDelay}) {
     assert(
-      !(_timer?.isActive ?? false) || _backingController?.status != AnimationStatus.reverse,
+      !(_timer?.isActive ?? false) ||
+          _backingController?.status != AnimationStatus.reverse,
       'timer must not be active when the tooltip is fading out',
     );
 
@@ -297,7 +313,10 @@ class TooltipPlusState extends State<TooltipPlus> with SingleTickerProviderState
           ..addPointer(event);
       case TooltipTriggerMode.tap:
         final recognizer =
-            _tapRecognizer ??= TapGestureRecognizer(debugOwner: this, supportedDevices: triggerModeDeviceKinds);
+            _tapRecognizer ??= TapGestureRecognizer(
+              debugOwner: this,
+              supportedDevices: triggerModeDeviceKinds,
+            );
         recognizer
           ..onTap = _handleTap
           ..addPointer(event);
@@ -316,10 +335,12 @@ class TooltipPlusState extends State<TooltipPlus> with SingleTickerProviderState
     /// 3. The event is not a pointer down event.
     ///    This prevents the tooltip from being dismissed when the user is moving the mouse.
     ///    or the pointer is up.
-    if (_tapRecognizer?.primaryPointer == event.pointer || _longPressRecognizer?.primaryPointer == event.pointer) {
+    if (_tapRecognizer?.primaryPointer == event.pointer ||
+        _longPressRecognizer?.primaryPointer == event.pointer) {
       return;
     }
-    if ((_timer == null && _controller.status == AnimationStatus.dismissed) || event is! PointerDownEvent) {
+    if ((_timer == null && _controller.status == AnimationStatus.dismissed) ||
+        event is! PointerDownEvent) {
       return;
     }
   }
@@ -339,7 +360,8 @@ class TooltipPlusState extends State<TooltipPlus> with SingleTickerProviderState
     widget.onTriggered?.call();
     _scheduleShowTooltip(
       withDelay: Duration.zero,
-      showDuration: _activeHoveringPointerDevices.isEmpty ? _showDuration : null,
+      showDuration:
+          _activeHoveringPointerDevices.isEmpty ? _showDuration : null,
     );
   }
 
@@ -351,7 +373,8 @@ class TooltipPlusState extends State<TooltipPlus> with SingleTickerProviderState
   void _handleLongPress() {
     if (!_visible) return;
 
-    final tooltipCreated = _visible && _controller.status == AnimationStatus.dismissed;
+    final tooltipCreated =
+        _visible && _controller.status == AnimationStatus.dismissed;
     if (tooltipCreated && _enableFeedback) {
       assert(_triggerMode == TooltipTriggerMode.longPress, '');
       Feedback.forLongPress(context);
@@ -379,12 +402,17 @@ class TooltipPlusState extends State<TooltipPlus> with SingleTickerProviderState
 
     final tooltipsToDismiss =
         TooltipPlus._openedTooltips
-            .where((TooltipPlusState tooltip) => tooltip._activeHoveringPointerDevices.isEmpty)
+            .where(
+              (TooltipPlusState tooltip) =>
+                  tooltip._activeHoveringPointerDevices.isEmpty,
+            )
             .toList();
     for (final tooltip in tooltipsToDismiss) {
       tooltip._scheduleDismissTooltip(withDelay: Duration.zero);
     }
-    _scheduleShowTooltip(withDelay: tooltipsToDismiss.isNotEmpty ? Duration.zero : _waitDuration);
+    _scheduleShowTooltip(
+      withDelay: tooltipsToDismiss.isNotEmpty ? Duration.zero : _waitDuration,
+    );
   }
 
   /// Handles the mouse exit event on the tooltip trigger.
@@ -419,7 +447,9 @@ class TooltipPlusState extends State<TooltipPlus> with SingleTickerProviderState
   @override
   void initState() {
     super.initState();
-    GestureBinding.instance.pointerRouter.addGlobalRoute(_handleGlobalPointerEvent);
+    GestureBinding.instance.pointerRouter.addGlobalRoute(
+      _handleGlobalPointerEvent,
+    );
   }
 
   @override
@@ -431,7 +461,10 @@ class TooltipPlusState extends State<TooltipPlus> with SingleTickerProviderState
   Widget _buildTooltipOverlay(BuildContext context) {
     final overlayState = Overlay.of(context);
     final box = this.context.findRenderObject()! as RenderBox;
-    final target = box.localToGlobal(box.size.center(Offset.zero), ancestor: overlayState.context.findRenderObject());
+    final target = box.localToGlobal(
+      box.size.center(Offset.zero),
+      ancestor: overlayState.context.findRenderObject(),
+    );
 
     final overlayChild = _TooltipOverlay(
       target: target,
@@ -439,7 +472,10 @@ class TooltipPlusState extends State<TooltipPlus> with SingleTickerProviderState
       alignment: widget.alignment!,
       onEnter: _handleMouseEnter,
       onExit: _handleMouseExit,
-      animation: CurvedAnimation(parent: _controller, curve: Curves.fastOutSlowIn),
+      animation: CurvedAnimation(
+        parent: _controller,
+        curve: Curves.fastOutSlowIn,
+      ),
       buildTooltipOffset: widget.buildTooltipOffset,
       child: SizedBox(
         key: GlobalKey(debugLabel: widget.messageWidget.hashCode.toString()),
@@ -454,7 +490,9 @@ class TooltipPlusState extends State<TooltipPlus> with SingleTickerProviderState
 
   @override
   void dispose() {
-    GestureBinding.instance.pointerRouter.removeGlobalRoute(_handleGlobalPointerEvent);
+    GestureBinding.instance.pointerRouter.removeGlobalRoute(
+      _handleGlobalPointerEvent,
+    );
     TooltipPlus._openedTooltips.remove(this);
     _longPressRecognizer?.onLongPressCancel = null;
     _longPressRecognizer?.dispose();
@@ -473,10 +511,18 @@ class TooltipPlusState extends State<TooltipPlus> with SingleTickerProviderState
       result = _ExclusiveMouseRegion(
         onEnter: _handleMouseEnter,
         onExit: _handleMouseExit,
-        child: Listener(onPointerDown: _handlePointerDown, behavior: HitTestBehavior.opaque, child: result),
+        child: Listener(
+          onPointerDown: _handlePointerDown,
+          behavior: HitTestBehavior.opaque,
+          child: result,
+        ),
       );
     }
-    return OverlayPortal(controller: _overlayController, overlayChildBuilder: _buildTooltipOverlay, child: result);
+    return OverlayPortal(
+      controller: _overlayController,
+      overlayChildBuilder: _buildTooltipOverlay,
+      child: result,
+    );
   }
 }
 
@@ -536,7 +582,13 @@ class _TooltipOverlayState extends State<_TooltipOverlay> {
         childSize = getSize(widget.child.key! as GlobalKey);
         offset = widget.target;
         if (widget.buildTooltipOffset != null) {
-          offset = widget.buildTooltipOffset?.call(offset, widget.box.size, childSize) ?? offset;
+          offset =
+              widget.buildTooltipOffset?.call(
+                offset,
+                widget.box.size,
+                childSize,
+              ) ??
+              offset;
         } else {
           switch (widget.alignment) {
             case TooltipAlignment.topLeftOfParent:
@@ -573,15 +625,27 @@ class _TooltipOverlayState extends State<_TooltipOverlay> {
 
   @override
   Widget build(BuildContext context) {
-    Widget result = FadeTransition(opacity: widget.animation, child: widget.child);
+    Widget result = FadeTransition(
+      opacity: widget.animation,
+      child: widget.child,
+    );
     if (widget.onEnter != null || widget.onExit != null) {
-      result = _ExclusiveMouseRegion(onEnter: widget.onEnter, onExit: widget.onExit, child: result);
+      result = _ExclusiveMouseRegion(
+        onEnter: widget.onEnter,
+        onExit: widget.onExit,
+        child: result,
+      );
     }
 
     return Positioned.fill(
       child: Transform.translate(
         offset: offset,
-        child: Container(width: childSize.width, height: childSize.height, alignment: Alignment.topLeft, child: result),
+        child: Container(
+          width: childSize.width,
+          height: childSize.height,
+          alignment: Alignment.topLeft,
+          child: result,
+        ),
       ),
     );
   }
@@ -592,7 +656,10 @@ class _TooltipOverlayState extends State<_TooltipOverlay> {
   /// [box] The [RenderBox] of the parent widget.
   /// Returns the calculated [Offset].
   Offset topLeftOfParent(Offset target, RenderBox box) {
-    return Offset(target.dx - box.size.width / 2, target.dy - box.size.width / 2 - childSize.height);
+    return Offset(
+      target.dx - box.size.width / 2,
+      target.dy - box.size.width / 2 - childSize.height,
+    );
   }
 
   /// Calculates the offset for the tooltip when it is aligned to the top center of its parent.
@@ -601,7 +668,10 @@ class _TooltipOverlayState extends State<_TooltipOverlay> {
   /// [box] The [RenderBox] of the parent widget.
   /// Returns the calculated [Offset].
   Offset topCenterOfParent(Offset target, RenderBox box) {
-    return Offset(target.dx - childSize.width / 2, target.dy - box.size.width / 2 - childSize.height);
+    return Offset(
+      target.dx - childSize.width / 2,
+      target.dy - box.size.width / 2 - childSize.height,
+    );
   }
 
   /// Calculates the offset for the tooltip when it is aligned to the top right of its parent.
@@ -610,7 +680,10 @@ class _TooltipOverlayState extends State<_TooltipOverlay> {
   /// [box] The [RenderBox] of the parent widget.
   /// Returns the calculated [Offset].
   Offset topRightOfParent(Offset target, RenderBox box) {
-    return Offset(target.dx + box.size.width / 2, target.dy - box.size.width / 2 - childSize.height);
+    return Offset(
+      target.dx + box.size.width / 2,
+      target.dy - box.size.width / 2 - childSize.height,
+    );
   }
 
   /// Calculates the offset for the tooltip when it is aligned to the top right of its parent.
@@ -619,7 +692,10 @@ class _TooltipOverlayState extends State<_TooltipOverlay> {
   /// [box] The [RenderBox] of the parent widget.
   /// Returns the calculated [Offset].
   Offset rightTopOfParent(Offset target, RenderBox box) {
-    return Offset(target.dx + box.size.width / 2, target.dy - (box.size.height / 2));
+    return Offset(
+      target.dx + box.size.width / 2,
+      target.dy - (box.size.height / 2),
+    );
   }
 
   /// Calculates the offset for the tooltip when it is aligned to the bottom right of its parent.
@@ -628,7 +704,10 @@ class _TooltipOverlayState extends State<_TooltipOverlay> {
   /// [box] The [RenderBox] of the parent widget.
   /// Returns the calculated [Offset].
   Offset rightBottomOfParent(Offset target, RenderBox box) {
-    return Offset(target.dx + box.size.width / 2, target.dy + (box.size.height / 2));
+    return Offset(
+      target.dx + box.size.width / 2,
+      target.dy + (box.size.height / 2),
+    );
   }
 
   /// Calculates the offset for the tooltip when it is aligned to the center right of its parent.
@@ -646,7 +725,10 @@ class _TooltipOverlayState extends State<_TooltipOverlay> {
   /// [box] The [RenderBox] of the parent widget.
   /// Returns the calculated [Offset].
   Offset leftTopOfParent(Offset target, RenderBox box) {
-    return Offset(target.dx - (box.size.width / 2) - childSize.width, target.dy - (box.size.height / 2));
+    return Offset(
+      target.dx - (box.size.width / 2) - childSize.width,
+      target.dy - (box.size.height / 2),
+    );
   }
 
   /// Calculates the offset for the tooltip when it is aligned to the center left of its parent.
@@ -655,7 +737,10 @@ class _TooltipOverlayState extends State<_TooltipOverlay> {
   /// [box] The [RenderBox] of the parent widget.
   /// Returns the calculated [Offset].
   Offset centerLeftOfParent(Offset target, RenderBox box) {
-    return Offset(target.dx - (box.size.width / 2) - childSize.width, target.dy);
+    return Offset(
+      target.dx - (box.size.width / 2) - childSize.width,
+      target.dy,
+    );
   }
 
   /// Calculates the offset for the tooltip when it is aligned to the bottom left of its parent.
@@ -664,7 +749,10 @@ class _TooltipOverlayState extends State<_TooltipOverlay> {
   /// [box] The [RenderBox] of the parent widget.
   /// Returns the calculated [Offset].
   Offset leftBottomOfParent(Offset target, RenderBox box) {
-    return Offset(target.dx - (box.size.width / 2) - childSize.width, target.dy + box.size.height / 2);
+    return Offset(
+      target.dx - (box.size.width / 2) - childSize.width,
+      target.dy + box.size.height / 2,
+    );
   }
 
   /// Calculates the offset for the tooltip when it is aligned to the bottom left of its parent.
@@ -673,7 +761,10 @@ class _TooltipOverlayState extends State<_TooltipOverlay> {
   /// [box] The [RenderBox] of the parent widget.
   /// Returns the calculated [Offset].
   Offset bottomLeftOfParent(Offset target, RenderBox box) {
-    return Offset(target.dx - box.size.width / 2, target.dy + box.size.width / 2);
+    return Offset(
+      target.dx - box.size.width / 2,
+      target.dy + box.size.width / 2,
+    );
   }
 
   Offset bottomCenterOfParent(Offset target, RenderBox box) {
@@ -686,7 +777,10 @@ class _TooltipOverlayState extends State<_TooltipOverlay> {
   /// [box] The [RenderBox] of the parent widget.
   /// Returns the calculated [Offset].
   Offset bottomRightOfParent(Offset target, RenderBox box) {
-    return Offset(target.dx + box.size.width / 2, target.dy + (box.size.height / 2));
+    return Offset(
+      target.dx + box.size.width / 2,
+      target.dy + (box.size.height / 2),
+    );
   }
 
   Size getSize(GlobalKey key) {
