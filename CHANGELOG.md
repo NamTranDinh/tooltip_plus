@@ -1,3 +1,5 @@
 ## 0.0.1
 
-* TODO: Describe initial release.
+- Support tooltip widget
+- Support custom tooltip
+- Flexible position

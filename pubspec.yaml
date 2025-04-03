@@ -1,7 +1,18 @@
 name: tooltip_plus
-description: "A new Flutter project."
+description: "A Flutter tooltip widget that offers rich customization and smart positioning to enhance user experience."
 version: 0.0.1
-homepage:
+homepage: https://github.com/NamTranDinh/tooltip_plus
+documentation: https://github.com/NamTranDinh/tooltip_plus/blob/main/README.md
+repository: https://github.com/NamTranDinh/tooltip_plus
+issue_tracker: https://github.com/NamTranDinh/tooltip_plus/issues
+topics:
+  - tooltip
+  - tooltip-widget
+  - custom-tooltip
+keywords:
+  - tooltip
+  - tooltip-widget
+  - custom-tooltip
 
 environment:
   sdk: ^3.7.2

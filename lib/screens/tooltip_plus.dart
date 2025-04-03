@@ -44,26 +44,16 @@ class EdgeOffset {
 }
 
 class _ExclusiveMouseRegion extends MouseRegion {
-  const _ExclusiveMouseRegion({
-    super.onEnter,
-    super.onExit,
-    super.child,
-  });
+  const _ExclusiveMouseRegion({super.onEnter, super.onExit, super.child});
 
   @override
   _RenderExclusiveMouseRegion createRenderObject(BuildContext context) {
-    return _RenderExclusiveMouseRegion(
-      onEnter: onEnter,
-      onExit: onExit,
-    );
+    return _RenderExclusiveMouseRegion(onEnter: onEnter, onExit: onExit);
   }
 }
 
 class _RenderExclusiveMouseRegion extends RenderMouseRegion {
-  _RenderExclusiveMouseRegion({
-    super.onEnter,
-    super.onExit,
-  });
+  _RenderExclusiveMouseRegion({super.onEnter, super.onExit});
 
   static bool isOutermostMouseRegion = true;
   static bool foundInnermostMouseRegion = false;
@@ -89,6 +79,19 @@ class _RenderExclusiveMouseRegion extends RenderMouseRegion {
   }
 }
 
+/// A widget that displays a tooltip when triggered.
+///
+/// The [messageWidget] is the widget that will be displayed as the tooltip message.
+///
+/// The [child] is the widget that will trigger the tooltip.
+///
+/// The [height] is the height of the tooltip.
+///
+/// The [waitDuration] is the duration to wait before showing the tooltip.
+///
+/// The [showDuration] is the duration to show the tooltip.
+///
+/// The [exitDuration] is the duration to wait before hiding the tooltip when the mouse exits.
 class TooltipPlus extends StatefulWidget {
   const TooltipPlus({
     super.key,
@@ -283,19 +286,18 @@ class TooltipPlusState extends State<TooltipPlus> with SingleTickerProviderState
     };
     switch (_triggerMode) {
       case TooltipTriggerMode.longPress:
-        final recognizer = _longPressRecognizer ??= LongPressGestureRecognizer(
-          debugOwner: this,
-          supportedDevices: triggerModeDeviceKinds,
-        );
+        final recognizer =
+            _longPressRecognizer ??= LongPressGestureRecognizer(
+              debugOwner: this,
+              supportedDevices: triggerModeDeviceKinds,
+            );
         recognizer
           ..onLongPress = _handleLongPress
           ..onLongPressUp = _handlePressUp
           ..addPointer(event);
       case TooltipTriggerMode.tap:
-        final recognizer = _tapRecognizer ??= TapGestureRecognizer(
-          debugOwner: this,
-          supportedDevices: triggerModeDeviceKinds,
-        );
+        final recognizer =
+            _tapRecognizer ??= TapGestureRecognizer(debugOwner: this, supportedDevices: triggerModeDeviceKinds);
         recognizer
           ..onTap = _handleTap
           ..addPointer(event);
@@ -375,9 +377,10 @@ class TooltipPlusState extends State<TooltipPlus> with SingleTickerProviderState
   void _handleMouseEnter(PointerEnterEvent event) {
     _activeHoveringPointerDevices.add(event.device);
 
-    final tooltipsToDismiss = TooltipPlus._openedTooltips
-        .where((TooltipPlusState tooltip) => tooltip._activeHoveringPointerDevices.isEmpty)
-        .toList();
+    final tooltipsToDismiss =
+        TooltipPlus._openedTooltips
+            .where((TooltipPlusState tooltip) => tooltip._activeHoveringPointerDevices.isEmpty)
+            .toList();
     for (final tooltip in tooltipsToDismiss) {
       tooltip._scheduleDismissTooltip(withDelay: Duration.zero);
     }
@@ -428,10 +431,7 @@ class TooltipPlusState extends State<TooltipPlus> with SingleTickerProviderState
   Widget _buildTooltipOverlay(BuildContext context) {
     final overlayState = Overlay.of(context);
     final box = this.context.findRenderObject()! as RenderBox;
-    final target = box.localToGlobal(
-      box.size.center(Offset.zero),
-      ancestor: overlayState.context.findRenderObject(),
-    );
+    final target = box.localToGlobal(box.size.center(Offset.zero), ancestor: overlayState.context.findRenderObject());
 
     final overlayChild = _TooltipOverlay(
       target: target,
@@ -473,18 +473,10 @@ class TooltipPlusState extends State<TooltipPlus> with SingleTickerProviderState
       result = _ExclusiveMouseRegion(
         onEnter: _handleMouseEnter,
         onExit: _handleMouseExit,
-        child: Listener(
-          onPointerDown: _handlePointerDown,
-          behavior: HitTestBehavior.opaque,
-          child: result,
-        ),
+        child: Listener(onPointerDown: _handlePointerDown, behavior: HitTestBehavior.opaque, child: result),
       );
     }
-    return OverlayPortal(
-      controller: _overlayController,
-      overlayChildBuilder: _buildTooltipOverlay,
-      child: result,
-    );
+    return OverlayPortal(controller: _overlayController, overlayChildBuilder: _buildTooltipOverlay, child: result);
   }
 }
 
@@ -589,12 +581,7 @@ class _TooltipOverlayState extends State<_TooltipOverlay> {
     return Positioned.fill(
       child: Transform.translate(
         offset: offset,
-        child: Container(
-          width: childSize.width,
-          height: childSize.height,
-          alignment: Alignment.topLeft,
-          child: result,
-        ),
+        child: Container(width: childSize.width, height: childSize.height, alignment: Alignment.topLeft, child: result),
       ),
     );
   }
